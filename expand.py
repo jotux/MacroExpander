@@ -5,40 +5,44 @@ import re
 
 @route('/')
 def index():
-    return template("index.tpl")
+    return template("index.tpl",inpt="",outp="")
 
-@route('/process/:mac#.+#', method='GET')
-def process(mac):
-    filename = "blah"
+@route('/macro/:mac#.+#', method='GET')
+def macro(mac):
+    filepath = "blah"   
     to_process = ""
+    filename = ""
     mac = mac.replace("<br>","\n");
-    # TODO: support permalinks
-    if False: #len(mac) == 6 and re.search(r"\d+",mac):
-        filename = './files/' + mac + '.c'
-        if os.path.isfile(filename) == True:
-            f = open(filename,'r')   
+    print mac
+    if len(mac) == 8 and re.search(r"\d+",mac):
+        filepath = './files/' + mac + '.c'
+        if os.path.isfile(filepath) == True:
+            f = open(filepath,'r')   
             to_process = f.read()
         else:
-            return template("index.tpl")
+            return template("index.tpl",inpt="",outp="")
     else:
-        count = 0
         for i in range(0,10):
-            filename = './files/' + str(randint(100000,999999)) + '.c'
-            if os.path.isfile(filename) == False:
+            filename = str(randint(10000000,99999999))
+            filepath = './files/' + filename + '.c'
+            if os.path.isfile(filepath) == False:
                 break
             elif i == 9:
                 return "ERROR"
-        f = open(filename,'w')
+        f = open(filepath,'w')
         f.write(mac)
         f.close()
-    p = subprocess.Popen(['gcc','-E',filename],stdout=subprocess.PIPE)
+    p = subprocess.Popen(['gcc','-E',filepath],stdout=subprocess.PIPE)
     out = p.communicate()[0].split('\n')
-    #os.remove(filename)
-    ret = ''
+    ret = ""
     for line in out:
         if line.startswith('#') == False:
             ret += line + '\n'
-    return ret
+    if len(to_process) > 0:
+        return template("index.tpl",inpt=to_process,outp=ret)
+    else:
+        ret = filename + "|" + ret
+        return ret
 
 
 @route('/static/:path#.+#', name='static')
