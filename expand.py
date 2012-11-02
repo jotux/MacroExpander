@@ -58,4 +58,4 @@ def mistake404(code):
     return 'Sorry, this page does not exist!'
 
 debug(True)
-run(reloader=True,host='192.168.1.101', port=80)
+run(reloader=True,host='localhost', port=80)
